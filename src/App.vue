@@ -1,10 +1,13 @@
 <template>
-  <h1>Hi Joey</h1>
-  <h3 v-if="status.published.open">PO on {{ status.published.date }}</h3>
-  <h3 v-else>PO closed</h3>
+  <div>
+    <img :src="require('@/assets/logo1.png')" alt="Our Little Treats"/>
+    <img :src="require('@/assets/logo2.png')" alt="Our Little Treats"/>
+  </div>
+  <p v-if="status.published.open">PO on {{ status.published.date }}</p>
+  <p v-else>PO closed</p>
   <div v-if="status.published.open" class="grid">
-    <Cards v-for="treat in treats.published" :key="treat.name" :treat="treat"/>
-    <Cards v-show="preview" v-for="treat in treats.preview" :key="treat.name" :treat="treat"/>
+    <Cards v-for="treat in treats.published" :key="treat.name" :treat="treat" :showDetails="true"/>
+    <Cards v-show="preview" v-for="treat in treats.preview" :key="treat.name" :treat="treat" :showDetails="true"/>
   </div>
   <div v-else>
     <p>thank you for your enthusiasm!<br>please be patient for next open PO 😁</p>
