@@ -1,111 +1,153 @@
 <template>
-  <div>
+  <div class="logos" :class="{down: viewCart}">
     <img :src="require('@/assets/logo1.png')" alt="Our Little Treats"/>
     <img :src="require('@/assets/logo2.png')" alt="Our Little Treats"/>
   </div>
-  <p v-if="status.published.open">PO on {{ status.published.date }}</p>
-  <p v-else>PO closed</p>
-  <div v-if="status.published.open" class="grid">
-    <Cards v-for="treat in treats.published" :key="treat.name" :treat="treat" :showDetails="true"/>
-    <Cards v-show="preview" v-for="treat in treats.preview" :key="treat.name" :treat="treat" :showDetails="true"/>
+  <router-view/>
+    <div class="contact">
+    <a href="https://instagram.com/ourlittletreats" target="_blank">@ourlittletreats</a>
+    <a href="https://wa.me/6281546013130" target="_blank">+62 815-4601-3130</a>
   </div>
-  <div v-else>
-    <p>thank you for your enthusiasm!<br>please be patient for next open PO 😁</p>
-  </div>
+  <transition name="slideLeft">
+    <button v-if="cartStore.items && cartStore.items.length" class="cart" @click="checkout()">
+      <div class="dot">
+        <p>{{cartStore.items.length}}</p>
+      </div>
+      <p v-if="$route.path === '/'">Checkout</p>
+      <p v-else-if="$route.path === '/cart'">Order</p>
+      <div class="bgChange" :class="{scaled: viewCart}"/>
+    </button>
+  </transition>
 </template>
 
 <script>
-import Cards from './components/Cards.vue'
-import Airtable from '@/services/Airtable'
-import Status from '@/services/Status'
+import { mapStores } from 'pinia'
+import { useCartStore } from "@/store";
 
-export default {
-  name: 'App',
-  components: {
-    Cards
-  },
+export default ({
   data() {
     return {
-      airtableResponse: [],
-      open: [],
-      preview: false,
+      viewCart: false,
     }
+  },
+  methods: {
+    checkout() {
+      if (this.$route.path === '/') {
+      this.viewCart = true
+      setTimeout(() => {
+        this.$router.push('/cart')
+      }, 2000)
+      } else if (this.$route.path === '/cart') {
+        window.open('https://wa.me/6281546013130', '_blank')
+      }
+    },
+    read_cookie(name) {
+      let result = document.cookie.match(new RegExp(name + '=([^;]+)'))
+      result && (result = JSON.parse(result[1]))
+      return result
+    },
   },
   mounted() {
-    const self= this
-    async function getTreats() {
-      try {
-        const response = await Airtable.getTreats()
-        console.log(response)
-        self.airtableResponse = response.data.records
-      } catch(err) {
-        console.log(err)
-      }
+    try {
+      this.cartStore.items = this.read_cookie('cart')
+    } catch(err) {
+      console.log(err)
     }
-
-    async function getStatus() {
-      try {
-        const response = await Status.getStatus()
-        console.log(response)
-        self.open = response.data.records
-      } catch(err) {
-        console.log(err)
-      }
-    }
-
-    getStatus() 
-    getTreats()         
   },
   computed: {
-    treats() {
-        const published = []
-        const preview = []
-        for (var i = 0; i !== this.airtableResponse.length; i++) {
-          const project = {
-            name: this.airtableResponse[i].fields.Name,
-            thumb: this.airtableResponse[i].fields.Thumbnail,
-            price: this.airtableResponse[i].fields.Price,
-            stock: this.airtableResponse[i].fields.Stock,
-            notes: this.airtableResponse[i].fields.Notes,
-            show: this.airtableResponse[i].fields['Show on Page']
-          }
-          if (this.airtableResponse[i].fields['Show on Page']) published.push(project)
-          else preview.push(project)
-        }
-        return { published, preview }
-    },
-    status() {
-      let published = {}
-      let preview = {}
-      for (var i = 0; i !== this.open.length; i++) {
-          const stat = {
-            open: this.open[i].fields['PO'],
-            date: this.open[i].fields['PO Date'],
-          }
-          if (this.open[i].fields.Name === 'Live') published = stat
-          else if (this.open[i].fields.Name === 'Preview') preview = stat
-        }
-        return { published, preview }
-    }
+    ...mapStores(useCartStore)
   }
-}
+})
 </script>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+body {
+  background-color: var(--secondary);
+  font-family: MADE Canvas, Verdana, Geneva, Tahoma, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
 
-  .grid {
-    margin: auto;
-    display: grid;
-    grid-template-columns: 300px 300px 300px;
-    grid-gap: 50px;
-    width: fit-content;
+  --primary: #806657;
+  --secondary: #DCD4D1;
+
+  #app {
+    margin: clamp(5px, 7vw, 25px);
+
+    .contact {
+      display: flex;
+      flex-direction: column;
+      margin-top: 1em;
+
+      a {
+        color: black;
+        margin-top: 0.5em;
+        text-align: left;
+        font-family: MADE coachella;
+        font-weight: 300;
+      }
+    }
+
+    .logos {
+      position: relative;
+      height: 20vh;
+      min-height: 50px;
+      display: flex;
+      justify-content: space-between;
+      z-index: 20;
+      transition: transform 1s ease;
+
+      &.down {
+        transform: translateY(3em);
+      }
+    }
+
+    .cart {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      font-family: MADE Coachella;
+      background-color: white;
+      padding: 1em 2em;
+      border: none;
+      border-radius: 10px/10px;
+      cursor: pointer;
+      z-index: 10;
+
+      .bgChange {
+        opacity: 0;
+        position: absolute;
+        border-radius: 1px/1px;
+        width: 1px;
+        height: 1px;
+        background-color: white;
+        transition: transform 2s ease;
+
+        &.scaled {
+          opacity: 1;
+          transform: scale(5000);
+        }
+      }
+
+      .dot {
+        position: absolute;
+        top: -15px;
+        left: -15px;
+        border-radius: 30px / 30px;
+        height: 30px;
+        width: 30px;
+        background-color: var(--primary);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 1.2rem;
+      }
+
+      p {
+        margin: 0;
+      }
+    }
   }
 }
 </style>
