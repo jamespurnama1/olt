@@ -4,7 +4,7 @@
       <p class="date" v-if="status.open">PO on <strong>{{ status.date.toDateString() }}</strong></p>
       <p class="closed" v-else><strong>PO closed</strong></p>
       <TransitionGroup tag="div" name="fade" v-if="status.open" class="grid">
-          <Cards v-for="treat in treats.published" :key="treat.name || loaded" :treat="treat" @cart="addToCart($event, item)" />
+          <Cards v-for="treat in treats" :key="treat.name || loaded" :treat="treat" @cart="addToCart($event, item)" />
       </TransitionGroup>
       <div v-else>
         <p class="closed">thank you for your enthusiasm!<br>please be patient for next open PO 😁</p>
@@ -39,7 +39,6 @@ export default {
   methods: {
     bake_cookie(name, value) {
       const cookie = [name, '=', JSON.stringify(value), '; expires=', this.getDate, '; path=/; SameSite=Strict;'].join('');
-      // const cookie = [name, '=', JSON.stringify(value), '; domain=.', window.location.host.toString(), '; path=/; SameSite=Strict;'].join('');
       document.cookie = cookie;
     },
     addToCart(item) {
@@ -65,22 +64,27 @@ export default {
       // expire in 7 days
       return (new Date(Date.now()+ 604800*1000)).toUTCString();
     },
+    previewDomain() {
+      return window.location.host.split('.')[0] === 'preview'
+    },
     treats() {
-        const published = []
-        const preview = []
-        for (var i = 0; i !== this.airtableResponse.length; i++) {
-          const project = {
-            name: this.airtableResponse[i].fields.Name,
-            thumb: this.airtableResponse[i].fields.Thumbnail,
-            price: this.airtableResponse[i].fields.Price,
-            stock: this.airtableResponse[i].fields.Stock,
-            notes: this.airtableResponse[i].fields.Notes,
-            show: this.airtableResponse[i].fields['Show on Page']
-          }
-          if (this.airtableResponse[i].fields['Show on Page']) published.push(project)
-          else preview.push(project)
+      const published = []
+      const preview = []
+      for (var i = 0; i !== this.airtableResponse.length; i++) {
+        const project = {
+          name: this.airtableResponse[i].fields.Name,
+          thumb: this.airtableResponse[i].fields.Thumbnail,
+          alt: this.airtableResponse[i].fields['Thumbnail Description'],
+          price: this.airtableResponse[i].fields.Price,
+          stock: this.airtableResponse[i].fields.Stock,
+          notes: this.airtableResponse[i].fields.Notes,
+          show: this.airtableResponse[i].fields['Show on Page']
         }
-        return { published, preview }
+        if (this.airtableResponse[i].fields['Show on Page']) published.push(project)
+        else preview.push(project)
+      }
+      if (this.previewDomain) return preview
+      else return published
     },
     ...mapStores(useCartStore)
   }

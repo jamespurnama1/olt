@@ -12,7 +12,7 @@
           <p>Add to Cart</p>
         </button>
     </transition>
-    <img :src="treat.thumb[0].url" />
+    <img :src="treat.thumb[0].url" :alt="treat.alt"/>
   </div>
 </template>
 
