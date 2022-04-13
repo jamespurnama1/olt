@@ -22,4 +22,17 @@ const router = createRouter({
   routes
 })
 
+router.beforeEach((to) => {
+  console.log(to)
+  setTimeout(() => {
+    if (to.name === 'cart') {
+      document.querySelector('body').style.setProperty('--secondary', 'white')
+      document.querySelector('body').style.setProperty('--tertiary', '#DCD4D1')
+    } else {
+      document.querySelector('body').style.setProperty('--secondary', '#DCD4D1')
+      document.querySelector('body').style.setProperty('--tertiary', 'white')
+    }
+  }, 1500)
+})
+
 export default router

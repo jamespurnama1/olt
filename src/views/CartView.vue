@@ -3,6 +3,7 @@
     <p>back</p>
   </button>
   <div class="cartPage">
+    <!-- <p>{{productSubtotals}}</p> -->
     <ul>
       <li v-for="(qty, name) in cartList" :key="name">
         {{qty}}x
