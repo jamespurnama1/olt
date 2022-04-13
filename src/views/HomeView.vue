@@ -23,7 +23,7 @@ import { mapStores } from 'pinia'
 import { useCartStore } from "@/store";
 
 export default {
-  name: 'App',
+  name: 'Home-View',
   components: {
     Cards
   },
@@ -112,8 +112,8 @@ export default {
 
 <style lang="scss" scoped>
     .date {
-      font-family: MADE Coachella;
-      font-weight: 100;
+      font-family: Georgia, 'Times New Roman', Times, serif;
+      // font-weight: 100;
       text-align: left;
 
       strong {

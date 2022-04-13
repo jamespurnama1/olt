@@ -44,7 +44,7 @@ export default {
   aspect-ratio: 2 / 3;
   text-align: left;
   color: white;
-  font-family: MADE Coachella;
+  font-family: Georgia, 'Times New Roman', Times, serif;
 
   .details {
     position: absolute;

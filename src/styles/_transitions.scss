@@ -1,5 +1,6 @@
 .slideUp-enter-active, .slideUp-leave-active,
-.slideLeft-enter-active, .slideLeft-leave-active {
+.slideLeft-enter-active, .slideLeft-leave-active,
+.slideRight-enter-active, .slideRight-leave-active {
   transition: all 0.5s ease;
 }
 
@@ -17,4 +18,8 @@
 
 .slideLeft-enter-from, .slideLeft-leave-to {
   transform: translateX(500px);
+}
+
+.slideRight-enter-from, .slideRight-leave-to {
+  transform: translateX(-500px);
 }
