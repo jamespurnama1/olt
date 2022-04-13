@@ -97,7 +97,7 @@ export default {
   .flex {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 3em;
+    margin-bottom: 1em;
     align-items: flex-end;
 
     h1 {
@@ -125,13 +125,15 @@ export default {
     padding: 0;
     display: flex;
     flex-direction: column;
+    border-radius: 10px/10px;
+    background-color: var(--tertiary);
 
     li {
       display: flex;
       justify-content: space-between;
       align-items: center;
       text-align: left;
-      padding-bottom: 1em;
+      padding: 0.5em 1em;
       flex-grow: 1;
 
       button {
@@ -142,7 +144,7 @@ export default {
 
         p {
           color: var(--primary);
-          font-size: 0.85em;
+          // font-size: 0.85em;
         }
       }
     }
@@ -165,17 +167,15 @@ export default {
   }
 
     .total {
-      margin-top: auto;
       text-align: right;
-      position: absolute;
-      right: 0;
-      bottom: 0;
 
-      p, h3 {
+      h3 {
         margin: 0;
+        margin-top: 1em;
       }
 
       p {
+        margin: 0;
         font-size: 0.5em;
       }
   }

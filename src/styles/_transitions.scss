@@ -2,11 +2,11 @@
 .slideLeft-enter-active, .slideLeft-leave-active,
 .slideRight-enter-active, .slideRight-leave-active,
 .list-enter-active, .list-leave-active {
-  transition: all 0.5s ease;
+  transition: all 0.5s ease !important;
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: all 0.7s ease;
+  transition: all 0.7s ease !important;
 }
 
 .fade-enter-from, .fade-leave-to {

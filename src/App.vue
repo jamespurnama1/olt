@@ -29,7 +29,7 @@
       <p v-else-if="$route.path === '/cart'">Order</p>
     </button>
   </transition>
-    <div class="bgChange" :class="{scaled: $route.path === '/cart'}"/>
+  <div class="bgChange" :class="{scaled: $route.path === '/cart'}"/>
 </template>
 
 <script>
@@ -52,8 +52,8 @@ export default ({
       // }, 2000)
       } else if (this.$route.path === '/cart') {
         let string = `${encodeURIComponent(this.status.header)} %0a`
-        Object.entries(this.cartList).forEach(([item, qty]) => string = string + `${encodeURIComponent(`${qty}x *${item}*`)} %0a Rp. ${this.price(item).price * qty} %0a %0a `)
-        string = string + `_*Total tanpa ongkir: ${this.totalPrice}*_`
+        Object.entries(this.cartList).forEach(([item, qty]) => string = string + `${encodeURIComponent(`${qty}x *${item}*`)} %0a Rp. ${(this.price(item).price * qty).toLocaleString()} %0a %0a `)
+        string = string + `_*Total tanpa ongkir: Rp. ${this.totalPrice.toLocaleString()}*_`
         window.open(`https://api.whatsapp.com/send?phone=${this.status.whatsapp}&text=${string}`, '_blank')
       }
     },
@@ -156,21 +156,22 @@ body {
     position: relative;
     margin: clamp(5px, 7vw, 25px);
     min-height: 87vh;
-    padding-bottom: 3.5em;
-    margin-bottom: 0;
+    padding-bottom: 4.5em;
+    margin-bottom: 2em;
 
     .contact {
       position: absolute;
       bottom: 0;
       display: flex;
       flex-direction: column;
-      margin-top: 1em;
+      margin-top: 2em;
 
       a {
         color: black;
         margin-top: 0.5em;
         text-align: left;
         font-family: MADE coachella;
+        font-size: 0.75em;
         font-weight: 300;
       }
     }
@@ -190,9 +191,11 @@ body {
     }
 
     .back {
-      position: fixed;
-      left: clamp(5px, 7vw, 25px);
-      top: clamp(5px, 7vw, 25px);
+      position: absolute;
+      // left: clamp(5px, 7vw, 25px);
+      left: 0;
+      // top: clamp(5px, 7vw, 25px);
+      top: 0;
       font-family: MADE Coachella;
       background-color: var(--tertiary);
       transition: background-color 0.5s ease;
@@ -202,6 +205,7 @@ body {
       cursor: pointer;
       z-index: 11;
       display: flex;
+      color: var(--primary);
 
       &:before {
         transform: rotate(180deg);
@@ -252,6 +256,8 @@ body {
       display: flex;
       align-items: center;
       transition: background-color 0.5s ease;
+      color: var(--primary);
+      filter: drop-shadow(rgba(0,0,0,0.2) 0 0 10px);
 
       &:after {
         content: url(@/assets/arrow.svg);
@@ -273,6 +279,7 @@ body {
         align-items: center;
         color: white;
         font-size: 1.2rem;
+        filter: drop-shadow(rgba(0,0,0,0.2) 0 0 10px);
       }
 
       p {
