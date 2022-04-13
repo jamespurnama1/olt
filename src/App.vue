@@ -5,7 +5,11 @@
         <p>Back</p>
       </button>
     </transition>
-    <div class="bgChangeBrown" :class="{scaled: $route.path === '/'}"/>
+    <div class="bgChangeBrown">
+      <svg :class="{scaled: $route.path === '/'}" height="10" width="10">
+        <circle cx="5" cy="5" r="5" fill="#DCD4D1" />
+      </svg>
+    </div>
   </router-link>
   <div class="logos" :class="{down: $route.path === '/cart'}">
     <img :src="require('@/assets/logo1.png')" alt="Our Little Treats"/>
@@ -29,7 +33,11 @@
       <p v-else-if="$route.path === '/cart'">Order</p>
     </button>
   </transition>
-  <div class="bgChange" :class="{scaled: $route.path === '/cart'}"/>
+  <div class="bgChange">
+    <svg :class="{scaled: $route.path === '/cart'}" height="10" width="10">
+      <circle cx="5" cy="5" r="5" fill="white" />
+    </svg>
+  </div>
 </template>
 
 <script>
@@ -146,7 +154,7 @@ body {
 
     @keyframes scaled {
     0% {opacity: 1;}
-    80% {transform: scale(5000); opacity: 1;}
+    80% {transform: scale(500); opacity: 1;}
     100% {opacity: 0;}
   }
 
@@ -157,7 +165,7 @@ body {
     margin: clamp(5px, 7vw, 25px);
     min-height: 87vh;
     padding-bottom: 4.5em;
-    margin-bottom: 2em;
+    // margin-bottom: 2em;
 
     .contact {
       position: absolute;
@@ -165,6 +173,7 @@ body {
       display: flex;
       flex-direction: column;
       margin-top: 2em;
+      z-index: 10;
 
       a {
         color: black;
@@ -192,9 +201,7 @@ body {
 
     .back {
       position: absolute;
-      // left: clamp(5px, 7vw, 25px);
       left: 0;
-      // top: clamp(5px, 7vw, 25px);
       top: 0;
       font-family: MADE Coachella;
       background-color: var(--tertiary);
@@ -227,18 +234,17 @@ body {
     }
 
     .bgChangeBrown {
-      position: fixed;
-      left: 15px;
-      top: 15px;
-      opacity: 0;
-      border-radius: 1px/1px;
-      width: 1px;
-      height: 1px;
-      background-color: #DCD4D1;
-      z-index: -1;
+      position: absolute;
+      left: clamp(5px, 7vw, 25px);
+      top: clamp(5px, 7vw, 25px);
+      z-index: 5;
 
-      &.scaled {
-        animation: scaled 1.5s;
+      svg {
+        opacity: 0;
+      }
+
+      svg.scaled {
+        animation: scaled 3s;
       }
     }
 
@@ -288,18 +294,18 @@ body {
     }
 
     .bgChange {
-      position: fixed;
+      transform: translate3d(0,0,0);
+      position: absolute;
       bottom: clamp(5px, 7vw, 25px);
       right: clamp(5px, 7vw, 25px);
-      opacity: 0;
-      border-radius: 1px/1px;
-      width: 1px;
-      height: 1px;
-      background-color: white;
-      z-index: -1;
+      z-index: 5;
 
-      &.scaled {
-        animation: scaled 1.5s;
+      svg {
+        opacity: 0;
+      }
+
+      svg.scaled {
+        animation: scaled 3s;
       }
     }
   }
