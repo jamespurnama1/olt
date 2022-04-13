@@ -4,7 +4,7 @@
     <transition name="fade">
       <div v-show="showDetails" class="details">
         <p>{{ treat.notes }}</p>
-        <p>Rp. {{ treat.price }}</p>
+        <p>Rp. {{ treat.price.toLocaleString() }}</p>
       </div>
     </transition>
     <transition name="slideUp">

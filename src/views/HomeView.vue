@@ -1,24 +1,21 @@
 <template>
   <transition name="fade">
     <div v-if="loaded">
-      <p class="date" v-if="status.published.open">PO on <strong>{{ status.published.date.toDateString() }}</strong></p>
-      <p v-else>PO closed</p>
-      <div v-if="status.published.open" class="grid">
-        <Cards v-for="treat in treats.published" :key="treat.name" :treat="treat" @cart="addToCart($event, item)" />
-        <!-- <Cards v-show="preview" v-for="treat in treats.preview" :key="treat.name" :treat="treat" :showDetails="true"/> -->
-      </div>
+      <p class="date" v-if="status.open">PO on <strong>{{ status.date.toDateString() }}</strong></p>
+      <p class="closed" v-else><strong>PO closed</strong></p>
+      <TransitionGroup tag="div" name="fade" v-if="status.open" class="grid">
+          <Cards v-for="treat in treats.published" :key="treat.name || loaded" :treat="treat" @cart="addToCart($event, item)" />
+      </TransitionGroup>
       <div v-else>
-        <p>thank you for your enthusiasm!<br>please be patient for next open PO 😁</p>
+        <p class="closed">thank you for your enthusiasm!<br>please be patient for next open PO 😁</p>
       </div>
     </div>
   </transition>
 </template>
 
 <script>
-// import gsap from "gsap"
 import Cards from '@/components/Cards.vue'
 import Airtable from '@/services/Airtable'
-import Status from '@/services/Status'
 import { mapStores } from 'pinia'
 import { useCartStore } from "@/store";
 
@@ -32,9 +29,12 @@ export default {
       airtableResponse: [],
       open: [],
       preview: false,
-      loaded: false,
       cart: [],
     }
+  },
+  props: {
+    status: Object,
+    loaded: Boolean,
   },
   methods: {
     bake_cookie(name, value) {
@@ -55,18 +55,8 @@ export default {
         console.log(err)
       }
     },
-    async getStatus() {
-      try {
-        const response = await Status.getStatus()
-        this.open = response.data.records
-        this.loaded = true
-      } catch(err) {
-        console.log(err)
-      }
-    }
   },
   mounted() {
-    this.getStatus() 
     this.getTreats()
     this.cart = this.cartStore.items       
   },
@@ -92,19 +82,6 @@ export default {
         }
         return { published, preview }
     },
-    status() {
-      let published = {}
-      let preview = {}
-      for (var i = 0; i !== this.open.length; i++) {
-          const stat = {
-            open: this.open[i].fields['PO'],
-            date: new Date(this.open[i].fields['PO Date']),
-          }
-          if (this.open[i].fields.Name === 'Live') published = stat
-          else if (this.open[i].fields.Name === 'Preview') preview = stat
-        }
-        return { published, preview }
-    },
     ...mapStores(useCartStore)
   }
 }
@@ -113,8 +90,15 @@ export default {
 <style lang="scss" scoped>
     .date {
       font-family: Georgia, 'Times New Roman', Times, serif;
-      // font-weight: 100;
       text-align: left;
+
+      strong {
+        font-weight: 700;
+      }
+    }
+
+    .closed {
+      font-family: Georgia, 'Times New Roman', Times, serif;
 
       strong {
         font-weight: 700;

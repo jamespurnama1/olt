@@ -13,8 +13,8 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/CartView.vue')
-  }
+    component: () => import(/* webpackChunkName: "cart" */ '../views/CartView.vue')
+  },
 ]
 
 const router = createRouter({
@@ -23,16 +23,16 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  console.log(to)
+  if (to.path !== '/cart' && to.path !== '/') return { name: 'home' }
   setTimeout(() => {
     if (to.name === 'cart') {
       document.querySelector('body').style.setProperty('--secondary', 'white')
       document.querySelector('body').style.setProperty('--tertiary', '#DCD4D1')
-    } else {
+    } else if (to.name === 'home') {
       document.querySelector('body').style.setProperty('--secondary', '#DCD4D1')
       document.querySelector('body').style.setProperty('--tertiary', 'white')
     }
-  }, 1500)
+  }, 1000)
 })
 
 export default router

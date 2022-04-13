@@ -1,40 +1,47 @@
-<template>
+`<template>
   <router-link to="/">
-    <!-- <transition name="slideRight"> -->
+    <transition name="slideRight">
       <button v-if="$route.path === '/cart'" class="back">
         <p>Back</p>
       </button>
-    <!-- </transition> -->
+    </transition>
     <div class="bgChangeBrown" :class="{scaled: $route.path === '/'}"/>
   </router-link>
   <div class="logos" :class="{down: $route.path === '/cart'}">
     <img :src="require('@/assets/logo1.png')" alt="Our Little Treats"/>
     <img :src="require('@/assets/logo2.png')" alt="Our Little Treats"/>
   </div>
-  <router-view :key="$route.path" />
-    <div class="contact">
-    <a href="https://instagram.com/ourlittletreats" target="_blank">@ourlittletreats</a>
-    <a href="https://wa.me/6281546013130" target="_blank">+62 815-4601-3130</a>
+  <router-view :status="status" :loaded="loaded" v-slot="{ Component }">
+    <transition name="fade">
+      <component :is="Component" />
+    </transition>
+  </router-view>
+  <div class="contact">
+    <a :href="`https://instagram.com/${status.instagram}`" target="_blank">@{{status.instagram}}</a>
+    <a :href="`https://wa.me/${status.whatsapp}`" target="_blank">+{{status.whatsapp}}</a>
   </div>
   <transition name="slideLeft">
-    <button v-if="cartStore.items && cartStore.items.length" class="cart" :class="{brown: $route.path === '/cart'}" @click="checkout()">
+    <button :key="$route.path" v-if="cartStore.items && cartStore.items.length" class="cart" @click="checkout()">
       <div class="dot">
         <p>{{cartStore.items.length}}</p>
       </div>
       <p v-if="$route.path === '/'">Checkout</p>
       <p v-else-if="$route.path === '/cart'">Order</p>
-      <div class="bgChange" :class="{scaled: $route.path === '/cart'}"/>
     </button>
   </transition>
+    <div class="bgChange" :class="{scaled: $route.path === '/cart'}"/>
 </template>
 
 <script>
 import { mapStores } from 'pinia'
+import Status from '@/services/Status'
 import { useCartStore } from "@/store";
 
 export default ({
   data() {
     return {
+      open: [],
+      loaded: false,
     }
   },
   methods: {
@@ -44,7 +51,10 @@ export default ({
         this.$router.push('/cart')
       // }, 2000)
       } else if (this.$route.path === '/cart') {
-        window.open('https://wa.me/6281546013130', '_blank')
+        let string = `${encodeURIComponent(this.status.header)} %0a`
+        Object.entries(this.cartList).forEach(([item, qty]) => string = string + `${encodeURIComponent(`${qty}x *${item}*`)} %0a Rp. ${this.price(item).price * qty} %0a %0a `)
+        string = string + `_*Total tanpa ongkir: ${this.totalPrice}*_`
+        window.open(`https://api.whatsapp.com/send?phone=${this.status.whatsapp}&text=${string}`, '_blank')
       }
     },
     read_cookie(name) {
@@ -60,7 +70,10 @@ export default ({
         document.querySelector('body').style.setProperty('--secondary', '#DCD4D1')
         document.querySelector('body').style.setProperty('--tertiary', 'white')
       }
-    }
+    },
+    price(name) {
+      return this.cartStore.items.find((item) => item.name === name)
+    },
   },
   mounted() {
     try {
@@ -69,9 +82,51 @@ export default ({
       console.log(err)
     }
   },
-  created() {
+  async created() {
+    try {
+        const response = await Status.getStatus()
+        this.open = response.data.records
+        if (!this.status.open) this.$router.push('/')
+        this.loaded = true
+      } catch(err) {
+        console.log(err)
+      }
   },
   computed: {
+    cartList() {
+      const list = {}
+      this.cartStore.items.forEach((item) => {
+        list[item.name] = (list[item.name] || 0) + 1
+      })
+      return list
+    },
+    totalPrice() {
+      let total = 0
+      this.cartStore.items.forEach((x) => {
+        total += this.price(x.name).price
+      })
+      return total
+    },
+    previewDomain() {
+      return window.location.host.split('.')[0] === 'preview'
+    },
+    status() {
+      let published = {}
+      let preview = {}
+      for (var i = 0; i !== this.open.length; i++) {
+        const stat = {
+          open: this.open[i].fields['PO'],
+          date: new Date(this.open[i].fields['PO Date']),
+          whatsapp: this.open[i].fields['WhatsApp'],
+          instagram: this.open[i].fields['Instagram'],
+          header: this.open[i].fields['Header']
+        }
+        if (this.open[i].fields.Name === 'Live') published = stat
+        else if (this.open[i].fields.Name === 'Preview') preview = stat
+      }
+      if (this.previewDomain) return preview
+      else return published
+    },
     ...mapStores(useCartStore)
   }
 })
@@ -89,11 +144,19 @@ body {
   --secondary: #DCD4D1;
   --tertiary: white;
 
+    @keyframes scaled {
+    0% {opacity: 1;}
+    80% {transform: scale(5000); opacity: 1;}
+    100% {opacity: 0;}
+  }
+
   #app {
+    display: flex;
+    flex-direction: column;
     position: relative;
     margin: clamp(5px, 7vw, 25px);
     min-height: 87vh;
-    padding-bottom: 3em;
+    padding-bottom: 3.5em;
     margin-bottom: 0;
 
     .contact {
@@ -128,18 +191,34 @@ body {
 
     .back {
       position: fixed;
-      left: 15px;
-      top: 15px;
+      left: clamp(5px, 7vw, 25px);
+      top: clamp(5px, 7vw, 25px);
       font-family: MADE Coachella;
       background-color: var(--tertiary);
+      transition: background-color 0.5s ease;
       padding: 1em 2em;
       border: none;
       border-radius: 10px/10px;
       cursor: pointer;
-      z-index: 10;
+      z-index: 11;
+      display: flex;
+
+      &:before {
+        transform: rotate(180deg);
+        content: url(@/assets/arrow.svg);
+        width: 20px;
+        float: left;
+        margin-right: 5px;
+        margin-top: -2px;
+      }
 
       p {
         margin: 0;
+      }
+
+      img {
+        transform: rotate(180deg);
+        
       }
     }
 
@@ -152,54 +231,33 @@ body {
       width: 1px;
       height: 1px;
       background-color: #DCD4D1;
-      z-index: 10;
-      // transition: transform 2s ease;
+      z-index: -1;
 
       &.scaled {
-        animation: scaled 3s;
-
-        @keyframes scaled {
-          0% {opacity: 1;}
-          90% {transform: scale(5000); opacity: 1;}
-          100% {opacity: 0;}
-        }
+        animation: scaled 1.5s;
       }
     }
 
     .cart {
       position: fixed;
-      bottom: 15px;
-      right: 15px;
+      bottom: clamp(5px, 7vw, 25px);
+      right: clamp(5px, 7vw, 25px);
       font-family: MADE Coachella;
-      background-color: white;
+      background-color: var(--tertiary);
       padding: 1em 2em;
       border: none;
       border-radius: 10px/10px;
       cursor: pointer;
       z-index: 10;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.5s ease;
 
-      &.brown {
-        background-color: var(--tertiary);
-      }
-
-      .bgChange {
-        opacity: 0;
-        position: absolute;
-        border-radius: 1px/1px;
-        width: 1px;
-        height: 1px;
-        background-color: white;
-        // transition: transform 2s ease;
-
-        &.scaled {
-          animation: scaled 3s;
-
-          @keyframes scaled {
-            0% {opacity: 1;}
-            90% {transform: scale(5000); opacity: 1;}
-            100% {opacity: 0;}
-          }
-        }
+      &:after {
+        content: url(@/assets/arrow.svg);
+        width: 20px;
+        float: right;
+        margin-left: 5px;
       }
 
       .dot {
@@ -219,6 +277,22 @@ body {
 
       p {
         margin: 0;
+      }
+    }
+
+    .bgChange {
+      position: fixed;
+      bottom: clamp(5px, 7vw, 25px);
+      right: clamp(5px, 7vw, 25px);
+      opacity: 0;
+      border-radius: 1px/1px;
+      width: 1px;
+      height: 1px;
+      background-color: white;
+      z-index: -1;
+
+      &.scaled {
+        animation: scaled 1.5s;
       }
     }
   }
