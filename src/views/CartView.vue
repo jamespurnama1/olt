@@ -91,7 +91,7 @@ export default {
   position: relative;
   top: 3em;
   text-align: left;
-  flex-grow: 1;
+  flex: 1;
   margin-bottom: 4em;
 
   .flex {
@@ -144,7 +144,6 @@ export default {
 
         p {
           color: var(--primary);
-          // font-size: 0.85em;
         }
       }
     }

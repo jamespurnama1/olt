@@ -55,9 +55,7 @@ export default ({
   methods: {
     checkout() {
       if (this.$route.path === '/') {
-      // setTimeout(() => {
         this.$router.push('/cart')
-      // }, 2000)
       } else if (this.$route.path === '/cart') {
         let string = `${encodeURIComponent(this.status.header)} %0a`
         Object.entries(this.cartList).forEach(([item, qty]) => string = string + `${encodeURIComponent(`${qty}x *${item}*`)} %0a Rp. ${(this.price(item).price * qty).toLocaleString()} %0a %0a `)
@@ -141,12 +139,24 @@ export default ({
 </script>
 
 <style lang="scss">
+html {
+  background-color: var(--secondary);
+}
+
 body {
   background-color: var(--secondary);
   font-family: MADE Canvas, Verdana, Geneva, Tahoma, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 
   --primary: #806657;
   --secondary: #DCD4D1;
@@ -159,20 +169,19 @@ body {
   }
 
   #app {
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
     position: relative;
     margin: clamp(5px, 7vw, 25px);
-    min-height: 87vh;
-    padding-bottom: 4.5em;
-    // margin-bottom: 2em;
+    margin-bottom: 0;
+    min-height: fit-content;
+    padding-bottom: calc(15px + env(safe-area-inset-bottom));
+    flex: 1;
 
     .contact {
-      position: absolute;
-      bottom: 0;
       display: flex;
       flex-direction: column;
-      margin-top: 2em;
+      margin-top: auto;
       z-index: 10;
 
       a {
@@ -188,7 +197,7 @@ body {
     .logos {
       position: relative;
       height: 20vh;
-      min-height: 50px;
+      min-height: 100px;
       display: flex;
       justify-content: space-between;
       z-index: 20;
@@ -250,7 +259,7 @@ body {
 
     .cart {
       position: fixed;
-      bottom: clamp(5px, 7vw, 25px);
+      bottom: 15px;
       right: clamp(5px, 7vw, 25px);
       font-family: MADE Coachella;
       background-color: var(--tertiary);
@@ -295,8 +304,8 @@ body {
 
     .bgChange {
       transform: translate3d(0,0,0);
-      position: absolute;
-      bottom: clamp(5px, 7vw, 25px);
+      position: fixed;
+      bottom: 15px;
       right: clamp(5px, 7vw, 25px);
       z-index: 5;
 

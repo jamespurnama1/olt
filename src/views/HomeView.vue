@@ -112,7 +112,7 @@ export default {
     .grid {
       --grid-layout-gap: 3vw;
       --grid-column-count: 4;
-      --grid-item--min-width: 100px;
+      --grid-item--min-width: 120px;
 
       --gap-count: calc(var(--grid-column-count) - 1);
       --total-gap-width: calc(var(--gap-count) * var(--grid-layout-gap));
@@ -121,5 +121,6 @@ export default {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(max(var(--grid-item--min-width), var(--grid-item--max-width)), 1fr));
       grid-gap: var(--grid-layout-gap);
+      margin-bottom: 2em;
     }
 </style>
