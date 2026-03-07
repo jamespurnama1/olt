@@ -1,4 +1,4 @@
-`<template>
+<template>
   <router-link to="/">
     <transition name="slideRight">
       <button v-if="$route.path === '/cart'" class="back">
@@ -12,8 +12,8 @@
     </div>
   </router-link>
   <div class="logos" :class="{down: $route.path === '/cart'}">
-    <img :src="require('@/assets/logo1.png')" alt="Our Little Treats"/>
-    <img :src="require('@/assets/logo2.png')" alt="Our Little Treats"/>
+    <img :src="logo1" alt="Our Little Treats"/>
+    <img :src="logo2" alt="Our Little Treats"/>
   </div>
   <router-view :status="status" :loaded="loaded" v-slot="{ Component }">
     <transition name="fade">
@@ -44,12 +44,16 @@
 import { mapStores } from 'pinia'
 import Status from '@/services/Status'
 import { useCartStore } from "@/store";
+import logo1 from '@/assets/logo1.png'
+import logo2 from '@/assets/logo2.png'
 
-export default ({
+export default {
   data() {
     return {
       open: [],
       loaded: false,
+      logo1,
+      logo2,
     }
   },
   methods: {
@@ -135,7 +139,7 @@ export default ({
     },
     ...mapStores(useCartStore)
   }
-})
+}
 </script>
 
 <style lang="scss">

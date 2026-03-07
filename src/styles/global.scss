@@ -1,3 +1,4 @@
-@import 'transitions';
-@import 'fonts';
-@import 'breakpoints';
+// Note: breakpoints mixins (@include max-media, @include min-media) are injected
+// globally in vite.config.js via css.preprocessorOptions.scss.additionalData
+@use 'transitions';
+@use 'fonts';
